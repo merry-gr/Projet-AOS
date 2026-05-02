@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer Produit{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="fw-bold">Supprimer Produit</h1>
+        <p class="lead">Confirmer la suppression</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="custom-card p-4 p-md-5 mx-auto text-center" style="max-width: 600px;">
+        <h3 class="mb-4">Voulez-vous vraiment supprimer <strong>{{ product.name }}</strong> ?</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+            <a href="{% url 'my_products' %}" class="btn btn-outline-secondary ms-2">Annuler</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

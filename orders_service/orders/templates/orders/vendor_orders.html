@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des Commandes | MedConnect{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #2563eb;
+        --secondary-slate: #64748b;
+        --card-border: rgba(226, 232, 240, 0.8);
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e4ed8 100%);
+        color: white;
+        padding: 90px 0 70px;
+        border-radius: 0 0 50px 50px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .orders-wrapper {
+        margin-top: -50px;
+        padding-bottom: 80px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .order-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border);
+        border-radius: 30px;
+        padding: 35px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    /* Status Badges Dynamiques */
+    .status-pill {
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .st-pending { background: #f1f5f9; color: #475569; }
+    .st-accepted { background: #dcfce7; color: #166534; }
+    .st-preparing { background: #dbeafe; color: #1e40af; }
+    .st-shipped { background: #fef9c3; color: #854d0e; }
+    .st-delivered { background: #10b981; color: white; }
+    .st-rejected { background: #fee2e2; color: #991b1b; }
+
+    .section-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--primary-blue);
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        margin-bottom: 4px;
+    }
+
+    .info-item span {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .product-tag {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--primary-blue);
+        padding: 6px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(37, 99, 235, 0.1);
+    }
+
+    .form-update {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-action {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: 0.2s;
+    }
+
+    /* Dark Mode Adjustments */
+    [data-bs-theme="dark"] .order-card { background: #1e293b; border-color: rgba(255,255,255,0.05); }
+    [data-bs-theme="dark"] .form-update { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); }
+    [data-bs-theme="dark"] .st-pending { background: rgba(255,255,255,0.1); color: #cbd5e1; }
+</style>
+
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-2">Commandes Clients</h1>
+        <p class="lead opacity-75">Suivez et gérez vos expéditions en temps réel</p>
+    </div>
+</div>
+
+<div class="container orders-wrapper">
+    {% for order in orders %}
+    <div class="order-card mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <span class="text-muted">ID COMMANDE</span>
+                <h3 class="fw-bold mb-0">#{{ order.id }}</h3>
+            </div>
+            <div class="text-end">
+                <span class="status-pill 
+                    {% if order.status == 'accepted' %}st-accepted
+                    {% elif order.status == 'preparing' %}st-preparing
+                    {% elif order.status == 'shipped' %}st-shipped
+                    {% elif order.status == 'delivered' %}st-delivered
+                    {% elif order.status == 'rejected' %}st-rejected
+                    {% else %}st-pending{% endif %}">
+                    {{ order.get_status_display|default:order.status }}
+                </span>
+                <div class="small text-muted mt-2">{{ order.created_at|date:"d M Y, H:i" }}</div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <span class="section-label">Détails Logistiques</span>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label><i class="bi bi-person me-1"></i> Acheteur</label>
+                        <span>{{ order.buyer.get_full_name|default:order.buyer.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label><i class="bi bi-telephone me-1"></i> Contact</label>
+                        <span>{{ order.phone }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label><i class="bi bi-geo-alt me-1"></i> Ville / Destination</label>
+                        <span>{{ order.city }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label><i class="bi bi-wallet2 me-1"></i> Paiement</label>
+                        <span>{{ order.payment_method }}</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-muted small fw-bold mb-1">ADRESSE PRÉCISE</label>
+                    <p class="mb-2 fw-semibold">{{ order.delivery_address }}</p>
+                    {% if order.delivery_note %}
+                        <div class="p-3 border-start border-primary border-4 bg-light rounded-3 small">
+                            <i class="bi bi-chat-left-dots me-2"></i><strong>Note client :</strong> {{ order.delivery_note }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <span class="section-label">Articles de votre catalogue</span>
+                <div class="mb-4">
+                    {% for item in order.items.all %}
+                        {% if item.product.vendor == user %}
+                            <div class="product-tag">
+                                {{ item.quantity }}x {{ item.product.name }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="form-update">
+                    <span class="section-label text-dark">Mise à jour logistique</span>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ order.id }}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Date de livraison prévue</label>
+                            <input type="date" name="estimated_delivery" value="{{ order.estimated_delivery|date:'Y-m-d' }}" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Votre note interne / Message client</label>
+                            <textarea name="vendor_note" class="form-control" rows="2" placeholder="Ex: Colis prêt pour expédition...">{{ order.vendor_note }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3">Enregistrer les infos</button>
+                    </form>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <label class="section-label mb-3">Changer l'état</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{% url 'update_order_status' order.id 'accepted' %}" class="btn btn-action btn-success">Accepter</a>
+                            <a href="{% url 'update_order_status' order.id 'preparing' %}" class="btn btn-action btn-primary">Préparation</a>
+                            <a href="{% url 'update_order_status' order.id 'shipped' %}" class="btn btn-action btn-info text-white">Expédiée</a>
+                            <a href="{% url 'update_order_status' order.id 'delivered' %}" class="btn btn-action btn-success">Livrée</a>
+                            <a href="{% url 'update_order_status' order.id 'rejected' %}" class="btn btn-action btn-outline-danger">Refuser</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5 bg-light rounded-5 border-dashed border-2">
+        <i class="bi bi-box2 display-1 text-muted opacity-25"></i>
+        <h3 class="mt-3 fw-bold text-muted">Aucune commande pour le moment</h3>
+        <p class="text-muted">Dès qu'un client commande vos produits, ils apparaîtront ici.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

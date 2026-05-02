@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Finaliser la Commande | MedConnect{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #2563eb;
+        --bg-light: #f8fafc;
+        --card-border: #e2e8f0;
+    }
+
+    .checkout-page {
+        margin-top: -32px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e4ed8 100%);
+        color: white;
+        padding: 80px 0 120px;
+        border-radius: 0 0 60px 60px;
+    }
+
+    .checkout-wrapper {
+        margin-top: -80px;
+        padding-bottom: 80px;
+    }
+
+    .checkout-card {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--card-border);
+        border-radius: 35px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .product-summary {
+        background: var(--bg-light);
+        padding: 30px;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .summary-badge {
+        background: white;
+        padding: 15px 25px;
+        border-radius: 20px;
+        border: 1px solid var(--card-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Form Styling */
+    .checkout-body {
+        padding: 45px;
+    }
+
+    .checkout-body h4 {
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--primary-blue);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+    }
+
+    .checkout-body h4 i {
+        margin-right: 10px;
+        font-size: 1.4rem;
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+    }
+
+    /* Django Form Field Refinement */
+    .checkout-body p {
+        margin-bottom: 1.5rem;
+    }
+
+    .checkout-body label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 0.9rem;
+    }
+
+    .checkout-body input, 
+    .checkout-body select, 
+    .checkout-body textarea {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 2px solid var(--card-border);
+        background: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .checkout-body input:focus, 
+    .checkout-body select:focus, 
+    .checkout-body textarea:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+
+    .btn-confirm {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        padding: 20px;
+        border-radius: 18px;
+        font-weight: 800;
+        font-size: 1.2rem;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .btn-confirm:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4);
+        color: white;
+    }
+
+    /* Dark Mode */
+    [data-bs-theme="dark"] .checkout-card { background: #1e293b; border-color: #334155; }
+    [data-bs-theme="dark"] .product-summary { background: #0f172a; border-color: #334155; }
+    [data-bs-theme="dark"] .summary-badge { background: #1e293b; border-color: #334155; }
+    [data-bs-theme="dark"] .checkout-body label { color: #cbd5e1; }
+    [data-bs-theme="dark"] .checkout-body input,
+    [data-bs-theme="dark"] .checkout-body select,
+    [data-bs-theme="dark"] .checkout-body textarea {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+</style>
+
+<div class="checkout-page">
+    <div class="page-header text-center">
+        <div class="container">
+            <span class="badge bg-white text-primary px-3 py-2 rounded-pill fw-bold mb-3">SECURE CHECKOUT</span>
+            <h1 class="display-5 fw-bold">Finaliser votre achat</h1>
+            <p class="opacity-75">Vous commandez l'équipement pour votre structure médicale</p>
+        </div>
+    </div>
+
+    <div class="container checkout-wrapper">
+        <div class="checkout-card mx-auto" style="max-width: 900px;">
+            <div class="product-summary">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h4 class="fw-bold mb-1">{{ product.name }}</h4>
+                        <p class="text-muted mb-0">Vendeur certifié MedConnect</p>
+                    </div>
+                    <div class="col-md-5 mt-3 mt-md-0">
+                        <div class="summary-badge">
+                            <span class="text-muted">Prix Unitaire</span>
+                            <span class="fw-bold text-primary fs-5">{{ product.price }} DA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-section">
+                        <h4><i class="bi bi-cart-plus"></i> Choix de la quantité</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ item_form.as_p }}
+                                <div class="small text-muted mt-n2">
+                                    <i class="bi bi-info-circle me-1"></i> Stock disponible : {{ product.stock }} unités
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-5 opacity-10">
+
+                    <div class="form-section">
+                        <h4><i class="bi bi-truck"></i> Informations de livraison</h4>
+                        <div class="row">
+                            <div class="col-12">
+                                {{ order_form.as_p }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info border-0 rounded-4 d-flex align-items-center mb-5">
+                        <i class="bi bi-shield-check fs-2 me-3"></i>
+                        <div>
+                            <strong>Paiement sécurisé :</strong> Vos informations sont protégées. Le règlement s'effectue selon la méthode choisie ci-dessus lors de la réception ou par virement.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-confirm w-100">
+                        Confirmer et Commander
+                    </button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'marketplace' %}" class="text-muted text-decoration-none small">
+                        <i class="bi bi-arrow-left me-1"></i> Continuer mes achats
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Ajout de classes Bootstrap et placeholders dynamiques
+    document.addEventListener("DOMContentLoaded", function() {
+        const selects = document.querySelectorAll('select');
+        const inputs = document.querySelectorAll('input, textarea');
+        
+        selects.forEach(s => s.classList.add('form-select'));
+        inputs.forEach(i => {
+            if(i.type !== 'checkbox') i.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}

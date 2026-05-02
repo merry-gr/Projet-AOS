@@ -1,0 +1,72 @@
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # Fixed path
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80" # Explicitly define the entrypoint
+    networks:
+      - web
+
+  consul:
+    image: consul:1.15
+    command: agent -dev -client=0.0.0.0
+    ports:
+      - "8500:8500"
+    networks:
+      - web
+
+  users:
+    build: ./users-services
+    ports:
+      - "8000:8000"
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.users.rule=Host(`users.localhost`)"
+      - "traefik.http.services.users.loadbalancer.server.port=8000"
+
+  products:
+    build: ./product_service
+    ports:
+      - "8001:8000"
+    volumes:
+    - ./media:/app/media
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.products.rule=Host(`products.localhost`)"
+      - "traefik.http.services.products.loadbalancer.server.port=8000"
+
+  orders:
+    build: ./orders_service
+    ports:
+      - "8002:8000"
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.orders.rule=Host(`orders.localhost`)"
+      - "traefik.http.services.orders.loadbalancer.server.port=8000"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge

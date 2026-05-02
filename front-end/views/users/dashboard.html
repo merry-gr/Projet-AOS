@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard | MedConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <style>
+    .dashboard-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e4ed8 100%);
+      color: white;
+      border-radius: 0 0 50px 50px;
+      padding: 100px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dashboard-panel { margin-top: -50px; position: relative; z-index: 10; }
+    .dashboard-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 35px;
+      height: 100%;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .dashboard-card:hover { transform: translateY(-8px); }
+    .icon-box {
+      width: 64px; height: 64px; border-radius: 18px; display:flex; align-items:center; justify-content:center;
+      font-size: 24px; color:#fff; margin-bottom: 25px;
+    }
+    .bg-gradient-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .bg-gradient-green { background: linear-gradient(135deg, #10b981, #047857); }
+    .bg-gradient-dark { background: linear-gradient(135deg, #475569, #1e293b); }
+    .btn-dash { border-radius: 12px; padding: 12px 20px; font-weight: 700; width: 100%; }
+  </style>
+</head>
+<body>
+<section class="dashboard-hero text-center">
+    <div class="container">
+        <h1 id="user-welcome" class="display-4 fw-bold mb-3">Bonjour 👋</h1>
+        <p class="opacity-75 fs-5">Gérez votre activité B2B en toute simplicité</p>
+        <div id="role-badge" class="badge bg-light text-dark rounded-pill px-4 py-2 mt-2"></div>
+    </div>
+</section>
+
+<section class="dashboard-panel pb-5">
+  <div class="container">
+    <div class="row g-4 justify-content-center" id="dashboard-actions"></div>
+  </div>
+</section>
+<script src="../../config.js"></script>
+<script src="../../modules/layout.js"></script>
+<script>window.MedLayout.init();</script>
+<script>
+  (function () {
+    const welcome = document.getElementById('user-welcome');
+    const badge = document.getElementById('role-badge');
+    const actions = document.getElementById('dashboard-actions');
+
+    const token = getAccessToken();
+    if (!token) {
+      location.href = './login.html';
+      return;
+    }
+    const role = localStorage.getItem('user_role') || 'acheteur';
+    const username = localStorage.getItem('username') || 'Utilisateur';
+
+    welcome.textContent = `Bonjour, ${username} 👋`;
+    badge.textContent = role === 'vendeur' ? 'Mode Fournisseur' : role === 'admin' ? 'Administrateur' : 'Mode Acheteur';
+
+    if (role === 'vendeur') {
+      actions.innerHTML = `
+        <div class="col-md-4"><div class="dashboard-card"><div class="icon-box bg-gradient-green"><i class="bi bi-plus-lg"></i></div><h3 class="h5 fw-bold">Nouveau Produit</h3><p class="text-muted">Ajoutez des produits à votre catalogue.</p><a href="../products/my-products.html" class="btn btn-success btn-dash mt-auto">Gérer produits</a></div></div>
+        <div class="col-md-4"><div class="dashboard-card"><div class="icon-box bg-gradient-dark"><i class="bi bi-receipt-cutoff"></i></div><h3 class="h5 fw-bold">Ventes</h3><p class="text-muted">Consultez et validez les commandes.</p><a href="../orders/vendor_orders.html" class="btn btn-dark btn-dash mt-auto">Voir commandes</a></div></div>
+      `;
+    } else if (role === 'admin') {
+      actions.innerHTML = `
+        <div class="col-md-5"><div class="dashboard-card"><div class="icon-box bg-gradient-dark"><i class="bi bi-person-badge"></i></div><h3 class="h5 fw-bold">Panel Admin</h3><p class="text-muted">Valider les utilisateurs et gérer la plateforme.</p><a href="http://localhost:8000/admin/" class="btn btn-dark btn-dash mt-auto">Ouvrir admin</a></div></div>
+        <div class="col-md-5"><div class="dashboard-card"><div class="icon-box bg-gradient-blue"><i class="bi bi-bar-chart"></i></div><h3 class="h5 fw-bold">Historique</h3><p class="text-muted">Voir toutes les commandes.</p><a href="../orders/admin_history.html" class="btn btn-primary btn-dash mt-auto">Historique</a></div></div>
+      `;
+    } else {
+      actions.innerHTML = `
+        <div class="col-md-5"><div class="dashboard-card"><div class="icon-box bg-gradient-blue"><i class="bi bi-search"></i></div><h3 class="h5 fw-bold">Explorer le Marché</h3><p class="text-muted">Voir les produits disponibles.</p><a href="../products/Marketplace.html" class="btn btn-primary btn-dash mt-auto">Marketplace</a></div></div>
+        <div class="col-md-5"><div class="dashboard-card"><div class="icon-box bg-gradient-green"><i class="bi bi-bag-check"></i></div><h3 class="h5 fw-bold">Mes Achats</h3><p class="text-muted">Suivez vos commandes.</p><a href="../orders/buyer_orders.html" class="btn btn-success btn-dash mt-auto">Mes commandes</a></div></div>
+      `;
+    }
+  })();
+</script>
+</body>
+</html>

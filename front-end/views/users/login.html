@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion Professionnelle | MedConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root { --med-primary:#0d6efd; --med-navy:#0f172a; --med-slate:#1e293b; --glass-bg:rgba(255,255,255,0.95);} 
+        .login-wrapper{min-height:90vh;display:flex;align-items:center;justify-content:center;padding:40px 15px;background:radial-gradient(circle at top right, rgba(13,110,253,0.05), transparent),radial-gradient(circle at bottom left, rgba(13,110,253,0.05), transparent);} 
+        .login-card{border:1px solid rgba(0,0,0,0.05);border-radius:24px;overflow:hidden;background:var(--glass-bg);box-shadow:0 25px 50px -12px rgba(0,0,0,0.1);max-width:1000px;width:100%;}
+        .login-left{background:var(--med-navy);background-image:radial-gradient(at 0% 0%, rgba(13,110,253,0.15) 0, transparent 50%),radial-gradient(at 100% 100%, rgba(56,189,248,0.1) 0, transparent 50%);color:white;padding:60px 40px;display:flex;flex-direction:column;justify-content:center;}
+        .brand-icon-box{width:60px;height:60px;background:rgba(255,255,255,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);margin-bottom:30px}
+        .login-left h2{font-weight:800;font-size:2.4rem;letter-spacing:-1px}
+        .login-left p{color:#94a3b8;line-height:1.6;font-size:1.1rem}
+        .login-right{padding:60px;background:white}
+        .login-title{font-weight:800;color:var(--med-navy);letter-spacing:-0.5px}
+        .login-right label{font-weight:700;font-size:0.75rem;margin-bottom:8px;display:block;color:#64748b;text-transform:uppercase;letter-spacing:1px}
+        .login-right input{width:100%;padding:12px 16px;border:2px solid #f1f5f9;border-radius:12px;transition:all 0.2s;background:#f8fafc;font-weight:500}
+        .login-right input:focus{border-color:var(--med-primary);background:white;outline:none;box-shadow:0 0 0 4px rgba(13,110,253,0.1)}
+        .btn-login{background:var(--med-navy);color:white;border:none;border-radius:12px;padding:14px;font-weight:700;transition:0.3s;margin-top:10px}
+        .btn-login:hover{background:#1e293b;transform:translateY(-2px);box-shadow:0 10px 20px rgba(15,23,42,0.2)}
+        .login-link a{color:var(--med-primary);font-weight:700;text-decoration:none}
+        @media (max-width:991px){.login-left{display:none}.login-right{padding:40px 30px}}
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="card login-card">
+            <div class="row g-0">
+                <div class="col-lg-5 login-left d-none d-lg-flex">
+                    <div class="brand-icon-box"><i class="bi bi-hexagon-fill text-info fs-2"></i></div>
+                    <h2>Plateforme Professionnelle</h2>
+                    <p>Connectez-vous à votre espace sécurisé pour gérer vos commandes et inventaires médicaux.</p>
+                    <div class="mt-auto">
+                        <div class="d-flex align-items-center gap-3 opacity-50">
+                            <i class="bi bi-shield-check fs-4"></i>
+                            <span class="small fw-bold">Chiffrement de bout en bout</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7 login-right">
+                    <div class="mb-5">
+                        <h2 class="login-title mb-1">Bon retour parmi nous</h2>
+                        <p class="text-muted small">Portail d'accès MedConnect B2B</p>
+                    </div>
+
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="username">Identifiant</label>
+                            <input id="username" name="username" type="text" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password">Mot de passe</label>
+                            <input id="password" name="password" type="password" required>
+                        </div>
+                        <div id="login-error" class="text-danger small mb-2" style="display:none"></div>
+                        <button type="submit" class="btn btn-login w-100">Se connecter au portail</button>
+                    </form>
+
+                    <div class="text-center mt-5 login-link">
+                        <p class="mb-0 text-muted small">Nouveau sur la plateforme ? <a href="register.html" class="ms-1">Demander un accès</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../config.js"></script>
+    <script>
+        (function(){
+            const form = document.getElementById('login-form');
+            const errEl = document.getElementById('login-error');
+            function apiBase(){ return (window.CONFIG && CONFIG.API_USERS_URL) ? CONFIG.API_USERS_URL : '' }
+
+            form.addEventListener('submit', async (e)=>{
+                e.preventDefault();
+                errEl.style.display='none';
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                if(!username || !password){ errEl.textContent='Veuillez remplir tous les champs.'; errEl.style.display='block'; return }
+
+                try{
+                    const resp = await fetch((apiBase()||'') + '/api/login/', {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify({username, password})
+                    });
+                    if(!resp.ok){
+                        const text = await resp.text();
+                        throw new Error(text || 'Erreur lors de la connexion');
+                    }
+                    const data = await resp.json();
+                    // #region agent log
+                    fetch('http://127.0.0.1:7374/ingest/f84ea1d7-84b9-446a-906c-5789c271fc7b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'03f699'},body:JSON.stringify({sessionId:'03f699',runId:'pre-fix',hypothesisId:'H4',location:'front-end/views/users/login.html:after-login-response',message:'Login response token/status shape',data:{hasToken:Boolean(data && data.token),hasAccess:Boolean(data && data.access),hasValidationStatus:Boolean(data && data.validation_status),hasRole:Boolean(data && data.role),keys:data?Object.keys(data):[]},timestamp:Date.now()})}).catch(()=>{});
+                    // #endregion
+                    if(data.access){
+                        localStorage.setItem('access_token', data.access);
+                        localStorage.setItem('refresh_token', data.refresh || '');
+                        localStorage.setItem('user_role', data.role || '');
+                        localStorage.setItem('username', username);
+                        // redirect
+                        let branch = 'dashboard';
+                        if(data.validation_status === 'pending'){ branch = 'pending'; location.href = '../../views/users/status_pending.html'; }
+                        else if(data.validation_status === 'refused'){ branch = 'refused'; location.href = '../../views/users/status_refused.html'; }
+                        else { location.href = '../../views/users/dashboard.html'; }
+                        // #region agent log
+                        fetch('http://127.0.0.1:7374/ingest/f84ea1d7-84b9-446a-906c-5789c271fc7b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'03f699'},body:JSON.stringify({sessionId:'03f699',runId:'pre-fix',hypothesisId:'H4',location:'front-end/views/users/login.html:redirect-branch',message:'Login redirect branch selected',data:{branch,validationStatus:data.validation_status || null},timestamp:Date.now()})}).catch(()=>{});
+                        // #endregion
+                    } else {
+                        throw new Error(data.detail || 'Authentification échouée');
+                    }
+                }catch(err){
+                    errEl.textContent = err.message || 'Erreur réseau';
+                    errEl.style.display='block';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

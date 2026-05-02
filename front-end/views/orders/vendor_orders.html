@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Commandes Clients | MedConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+</head>
+<body data-orders-view="vendor">
+<style>
+    :root {
+        --primary-blue: #2563eb;
+        --secondary-slate: #64748b;
+        --card-border: rgba(226, 232, 240, 0.8);
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e4ed8 100%);
+        color: white;
+        padding: 90px 0 70px;
+        border-radius: 0 0 50px 50px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .orders-wrapper {
+        margin-top: -50px;
+        padding-bottom: 80px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .order-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border);
+        border-radius: 30px;
+        padding: 35px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    /* Status Badges Dynamiques */
+    .status-pill {
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .st-pending { background: #f1f5f9; color: #475569; }
+    .st-accepted { background: #dcfce7; color: #166534; }
+    .st-preparing { background: #dbeafe; color: #1e40af; }
+    .st-shipped { background: #fef9c3; color: #854d0e; }
+    .st-delivered { background: #10b981; color: white; }
+    .st-rejected { background: #fee2e2; color: #991b1b; }
+    .st-cancelled { background: #e5e7eb; color: #374151; }
+
+    .section-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--primary-blue);
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        margin-bottom: 4px;
+    }
+
+    .info-item span {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .product-tag {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--primary-blue);
+        padding: 6px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(37, 99, 235, 0.1);
+    }
+
+    .form-update {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-action {
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: 0.2s;
+    }
+
+    /* Dark Mode Adjustments */
+    [data-bs-theme="dark"] .order-card { background: #1e293b; border-color: rgba(255,255,255,0.05); }
+    [data-bs-theme="dark"] .form-update { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); }
+    [data-bs-theme="dark"] .st-pending { background: rgba(255,255,255,0.1); color: #cbd5e1; }
+</style>
+
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-2">Commandes Clients</h1>
+        <p class="lead opacity-75">Suivez et gérez vos expéditions en temps réel</p>
+    </div>
+</div>
+
+<div class="container orders-wrapper">
+    <div id="orders-list-container"></div>
+</div>
+<script src="../../config.js"></script>
+<script src="../../modules/layout.js"></script>
+<script>window.MedLayout.init();</script>
+<script src="../../modules/order_mgr.js"></script>
+</body>
+</html>

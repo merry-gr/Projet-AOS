@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Historique global des commandes</h2>
+
+    {% for order in orders %}
+        <div class="card shadow-sm border-0 rounded-4 mb-4 p-4">
+            <h5 class="fw-bold">Commande #{{ order.id }}</h5>
+            <p><strong>Acheteur:</strong> {{ order.buyer.username }}</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Date:</strong> {{ order.created_at }}</p>
+            <p><strong>Ville:</strong> {{ order.city }}</p>
+            <p><strong>Adresse:</strong> {{ order.delivery_address }}</p>
+            <p><strong>Téléphone:</strong> {{ order.phone }}</p>
+
+            <ul>
+                {% for item in order.items.all %}
+                    <li>
+                        {{ item.product.name }} — {{ item.quantity }} pcs — 
+                        Vendor: {{ item.product.vendor.username }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% empty %}
+        <div class="alert alert-info rounded-4">
+            Aucun historique disponible.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

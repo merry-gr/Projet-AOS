@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Commandes{% endblock %}
+
+{% block content %}
+<style>
+    .orders-wrapper {
+        min-height: 88vh;
+        padding: 40px 0 60px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .orders-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .orders-title {
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+
+    .orders-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+    }
+
+    .order-card {
+        border: none;
+        border-radius: 24px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        padding: 30px 28px;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.10);
+    }
+
+    .order-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .order-id {
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-confirmed {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-shipped {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .status-delivered {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .status-cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .info-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 15px 18px;
+    }
+
+    .info-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .info-value {
+        color: #111827;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 15px;
+    }
+
+    .items-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 25px 0;
+    }
+
+    .items-list li {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        color: #374151;
+    }
+
+    .btn-cancel {
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+    }
+
+    .empty-orders {
+        border: none;
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        padding: 50px 30px;
+        text-align: center;
+    }
+
+    .empty-orders h4 {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+
+    .empty-orders p {
+        color: #6b7280;
+        margin: 0;
+    }
+
+    /* DARK MODE */
+    [data-bs-theme="dark"] .orders-title {
+        color: white;
+    }
+
+    [data-bs-theme="dark"] .orders-subtitle {
+        color: #cbd5e1;
+    }
+
+    [data-bs-theme="dark"] .order-card,
+    [data-bs-theme="dark"] .empty-orders {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    [data-bs-theme="dark"] .order-id,
+    [data-bs-theme="dark"] .section-title,
+    [data-bs-theme="dark"] .empty-orders h4 {
+        color: white;
+    }
+
+    [data-bs-theme="dark"] .info-box,
+    [data-bs-theme="dark"] .items-list li {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    [data-bs-theme="dark"] .info-label {
+        color: #93c5fd;
+    }
+
+    [data-bs-theme="dark"] .info-value,
+    [data-bs-theme="dark"] .items-list li,
+    [data-bs-theme="dark"] .empty-orders p {
+        color: #e2e8f0;
+    }
+
+    [data-bs-theme="dark"] .btn-cancel {
+        border-color: rgba(255,255,255,0.25);
+        color: white;
+    }
+
+    [data-bs-theme="dark"] .btn-cancel:hover {
+        background: rgba(255,255,255,0.08);
+        color: white;
+    }
+</style>
+
+<div class="container orders-wrapper">
+    <div class="orders-header">
+        <h1 class="orders-title">Mes Commandes</h1>
+        <p class="orders-subtitle">Suivez vos achats facilement</p>
+    </div>
+
+    {% for order in orders %}
+        <div class="order-card">
+            <div class="order-top">
+                <h4 class="order-id">Commande #{{ order.id }}</h4>
+
+                <span class="status-badge
+                    {% if order.status == 'pending' %}status-pending
+                    {% elif order.status == 'confirmed' %}status-confirmed
+                    {% elif order.status == 'shipped' %}status-shipped
+                    {% elif order.status == 'delivered' %}status-delivered
+                    {% elif order.status == 'cancelled' %}status-cancelled
+                    {% endif %}">
+                    {% if order.status == 'pending' %}
+                        En attente
+                    {% elif order.status == 'confirmed' %}
+                        Confirmée
+                    {% elif order.status == 'shipped' %}
+                        Expédiée
+                    {% elif order.status == 'delivered' %}
+                        Livrée
+                    {% elif order.status == 'cancelled' %}
+                        Annulée
+                    {% else %}
+                        {{ order.status }}
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="order-info">
+                <div class="info-box">
+                    <div class="info-label">Date de commande</div>
+                    <p class="info-value">{{ order.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Livraison estimée</div>
+                    <p class="info-value">{{ order.estimated_delivery|date:"d/m/Y" }}</p>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Note du vendeur</div>
+                    <p class="info-value">
+                        {% if order.vendor_note %}
+                            {{ order.vendor_note }}
+                        {% else %}
+                            Aucune note
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <h5 class="section-title">Produits commandés</h5>
+            <ul class="items-list">
+                {% for item in order.items.all %}
+                    <li>
+                        <strong>{{ item.product.name }}</strong><br>
+                        Quantité : {{ item.quantity }} pièce(s)<br>
+                        Vendeur : {{ item.product.vendor.username }}
+                    </li>
+                {% empty %}
+                    <li>Aucun produit dans cette commande.</li>
+                {% endfor %}
+            </ul>
+
+            {% if order.status == 'pending' %}
+                <a href="{% url 'cancel_order' order.id %}" class="btn btn-outline-danger btn-cancel">
+                    Annuler la commande
+                </a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div class="empty-orders">
+            <h4>Aucune commande</h4>
+            <p>Vous n’avez encore passé aucune commande.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

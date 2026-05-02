@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mes commandes</title>
+</head>
+<body>
+    <h1>Mes commandes</h1>
+
+    <a href="{% url 'dashboard' %}">Dashboard</a> |
+    <a href="{% url 'marketplace' %}">Marketplace</a> |
+    <a href="{% url 'logout' %}">Logout</a>
+
+    <hr>
+
+    {% for order in orders %}
+        <div style="border:1px solid gray; padding:10px; margin:10px;">
+            <h3>Commande #{{ order.id }}</h3>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Date:</strong> {{ order.created_at }}</p>
+
+            {% for item in order.items.all %}
+                <p>
+                    Produit: {{ item.product.name }} |
+                    Quantité: {{ item.quantity }} |
+                    Prix: {{ item.product.price }} DA
+                </p>
+            {% endfor %}
+        </div>
+    {% empty %}
+        <p>Vous n'avez encore aucune commande.</p>
+    {% endfor %}
+</body>
+</html>

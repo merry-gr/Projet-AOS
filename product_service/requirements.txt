@@ -1,0 +1,7 @@
+Django
+djangorestframework
+requests
+Pillow
+django-cors-headers
+pika
+python-consul
