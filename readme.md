@@ -153,11 +153,4 @@ Elle met en relation les fournisseurs (vendeurs) et les professionnels de santé
 
 ---
 
-## 🐳 Installation
-
-### 1. Cloner le projet
-
-```bash
-git clone https://github.com/your-username/mediconnect.git
-cd mediconnect
 
