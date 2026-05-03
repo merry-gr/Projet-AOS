@@ -88,11 +88,23 @@
                         headers:{'Content-Type':'application/json'},
                         body: JSON.stringify({username, password})
                     });
+                    // Try to parse JSON response even on non-2xx to handle validation states
+                    const data = await resp.json().catch(() => null);
                     if(!resp.ok){
-                        const text = await resp.text();
-                        throw new Error(text || 'Erreur lors de la connexion');
+                        // If account not approved, redirect to pending/refused pages
+                        if(resp.status === 403 && data && data.validation_status){
+                            if(data.validation_status === 'pending'){
+                                location.href = 'status_pending.html';
+                                return;
+                            }
+                            if(data.validation_status === 'refused'){
+                                location.href = 'status_refused.html';
+                                return;
+                            }
+                        }
+                        const msg = (data && (data.detail || data.error)) || 'Erreur lors de la connexion';
+                        throw new Error(msg);
                     }
-                    const data = await resp.json();
                     // #region agent log
                     fetch('http://127.0.0.1:7374/ingest/f84ea1d7-84b9-446a-906c-5789c271fc7b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'03f699'},body:JSON.stringify({sessionId:'03f699',runId:'pre-fix',hypothesisId:'H4',location:'front-end/views/users/login.html:after-login-response',message:'Login response token/status shape',data:{hasToken:Boolean(data && data.token),hasAccess:Boolean(data && data.access),hasValidationStatus:Boolean(data && data.validation_status),hasRole:Boolean(data && data.role),keys:data?Object.keys(data):[]},timestamp:Date.now()})}).catch(()=>{});
                     // #endregion

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corriger profil | MedConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <style>
+        :root {
+            --med-blue: #2563eb;
+            --med-red: #dc2626;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        .edit-wrapper {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+        }
+
+        .edit-card {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 35px;
+            overflow: hidden;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Colonne Gauche - Info */
+        .edit-left {
+            background: linear-gradient(135deg, var(--med-blue) 0%, var(--med-red) 100%);
+            color: white;
+            padding: 60px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .edit-left h2 {
+            font-weight: 800;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .edit-left p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* Colonne Droite - Formulaire */
+        .edit-right {
+            padding: 50px 45px;
+        }
+
+        .edit-title {
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #1e293b;
+            font-size: 1.5rem;
+        }
+
+        /* Style des labels et inputs */
+        .edit-right label {
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+            color: #475569;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .edit-right input,
+        .edit-right select,
+        .edit-right textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #f1f5f9;
+            border-radius: 16px;
+            background: #f8fafc;
+            color: #1e293b;
+            transition: 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .edit-right input:focus {
+            border-color: var(--med-blue);
+            background: white;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--med-blue) 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-weight: 700;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .rejection-alert {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        /* --- DARK MODE --- */
+        [data-bs-theme="dark"] .edit-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-bs-theme="dark"] .edit-left {
+            background: linear-gradient(135deg, #1e3a8a 0%, #7f1d1d 100%);
+        }
+
+        [data-bs-theme="dark"] .edit-title {
+            color: #ffffff;
+        }
+
+        [data-bs-theme="dark"] .edit-right label {
+            color: #94a3b8;
+        }
+
+        [data-bs-theme="dark"] .edit-right input,
+        [data-bs-theme="dark"] .edit-right select,
+        [data-bs-theme="dark"] .edit-right textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        [data-bs-theme="dark"] .edit-right input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--med-blue);
+        }
+
+        @media (max-width: 768px) {
+            .edit-left { display: none; }
+            .edit-card { border-radius: 25px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container edit-wrapper">
+        <div class="row justify-content-center w-100">
+            <div class="col-lg-11 col-xl-10">
+                <div class="card edit-card border-0 shadow-lg">
+                    <div class="row g-0">
+
+                        <div class="col-md-5 edit-left">
+                            <div class="mb-4">
+                                <i class="bi bi-pencil-square display-4"></i>
+                            </div>
+                            <h2>Corriger votre profil ✍️</h2>
+                            <p>
+                                Prenez le temps de vérifier les remarques de l'administrateur. 
+                                Une fois vos informations mises à jour, votre profil sera réévalué prioritairement.
+                            </p>
+                            <div class="mt-4 pt-4 border-top border-white border-opacity-25">
+                                <small class="opacity-75">
+                                    <i class="bi bi-shield-lock me-2"></i> Données sécurisées et cryptées
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 edit-right">
+                            <h2 class="edit-title">Formulaire de correction</h2>
+
+                            <!-- Rejection reason alert -->
+                            <div class="rejection-alert">
+                                <h5><i class="bi bi-info-circle me-2"></i>Raison du rejet:</h5>
+                                <p id="rejection-reason" class="mb-0">Chargement...</p>
+                            </div>
+
+                            <form id="profile-form">
+                                <!-- User Information Section -->
+                                <h5 class="mb-3 text-primary">Informations Utilisateur</h5>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Nom d'utilisateur *</label>
+                                    <input type="text" id="username" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" id="email" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Rôle *</label>
+                                    <select id="role" class="form-control" required>
+                                        <option value="">Sélectionner...</option>
+                                        <option value="vendeur">Vendeur</option>
+                                        <option value="acheteur">Acheteur</option>
+                                    </select>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <!-- Profile Information Section -->
+                                <h5 class="mb-3 text-primary">Informations Profil</h5>
+
+                                <!-- Vendor specific fields -->
+                                <div id="vendor-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nom de l'entreprise *</label>
+                                        <input type="text" id="company_name" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Numéro de licence *</label>
+                                        <input type="text" id="license_number" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <!-- Buyer specific fields -->
+                                <div id="buyer-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nom de l'entreprise *</label>
+                                        <input type="text" id="buyer_company_name" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Type d'acheteur *</label>
+                                        <select id="buyer_type" class="form-control" required>
+                                            <option value="">Sélectionner...</option>
+                                            <option value="hopital">Hôpital</option>
+                                            <option value="clinique">Clinique</option>
+                                            <option value="pharmacie">Pharmacie</option>
+                                            <option value="laboratoire">Laboratoire</option>
+                                            <option value="particulier">Particulier</option>
+                                            <option value="autre">Autre</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Numéro d'enregistrement *</label>
+                                        <input type="text" id="registration_number" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <!-- Common fields -->
+                                <div class="mb-3">
+                                    <label class="form-label">Téléphone *</label>
+                                    <input type="tel" id="phone" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Adresse complète *</label>
+                                    <textarea id="address" class="form-control" rows="4" required></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-edit w-100">
+                                    <i class="bi bi-send-fill me-2"></i> Renvoyer pour validation
+                                </button>
+                                
+                                <div class="text-center mt-4">
+                                    <a href="login.html" class="text-muted small text-decoration-none">
+                                        <i class="bi bi-box-arrow-left"></i> Se déconnecter et corriger plus tard
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../config.js"></script>
+    <script src="../../modules/layout.js"></script>
+    <script>window.MedLayout.init();</script>
+    <script>
+        let currentProfile = null;
+
+        async function loadProfile() {
+            try {
+                // First load user info
+                const userResponse = await fetch(`${CONFIG.API_USERS_URL}/api/profile/`, {
+                    headers: { ...authHeader() }
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error('Erreur de chargement du profil');
+                }
+
+                const data = await userResponse.json();
+                currentProfile = data;
+                
+                // Display rejection reason
+                const reasonElement = document.getElementById('rejection-reason');
+                reasonElement.textContent = data.rejection_reason || 'Aucune raison spécifiée';
+                
+                // Make rejection reason visible if it exists
+                if (data.rejection_reason) {
+                    reasonElement.style.color = '#dc2626';
+                    reasonElement.style.fontWeight = 'bold';
+                }
+
+                // Fill user fields
+                document.getElementById('username').value = data.username || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('role').value = data.role || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('address').value = data.address || '';
+
+                // Show role-specific fields
+                toggleRoleFields(data.role);
+
+                // Fill role-specific fields
+                if (data.role === 'vendeur') {
+                    document.getElementById('company_name').value = data.company_name || '';
+                    document.getElementById('license_number').value = data.license_number || '';
+                } else if (data.role === 'acheteur') {
+                    document.getElementById('buyer_company_name').value = data.company_name || '';
+                    document.getElementById('buyer_type').value = data.buyer_type || '';
+                    document.getElementById('registration_number').value = data.registration_number || '';
+                }
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                alert('Erreur de chargement du profil: ' + error.message);
+            }
+        }
+
+        function toggleRoleFields(role) {
+            // Hide all role-specific fields
+            document.getElementById('vendor-fields').style.display = 'none';
+            document.getElementById('buyer-fields').style.display = 'none';
+            
+            // Show relevant fields
+            if (role === 'vendeur') {
+                document.getElementById('vendor-fields').style.display = 'block';
+            } else if (role === 'acheteur') {
+                document.getElementById('buyer-fields').style.display = 'block';
+            }
+        }
+
+        async function submitProfile(event) {
+            event.preventDefault();
+
+            // Get form data manually by field IDs
+            const data = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                role: document.getElementById('role').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+
+            // Add role-specific fields
+            if (data.role === 'vendeur') {
+                data.company_name = document.getElementById('company_name').value;
+                data.license_number = document.getElementById('license_number').value;
+            } else if (data.role === 'acheteur') {
+                data.company_name = document.getElementById('buyer_company_name').value;
+                data.buyer_type = document.getElementById('buyer_type').value;
+                data.registration_number = document.getElementById('registration_number').value;
+            }
+
+            // Validate required fields
+            const requiredFields = ['username', 'email', 'role', 'phone', 'address'];
+            const role = data.role;
+            
+            if (role === 'vendeur') {
+                requiredFields.push('company_name', 'license_number');
+            } else if (role === 'acheteur') {
+                requiredFields.push('buyer_company_name', 'buyer_type', 'registration_number');
+            }
+
+            for (const field of requiredFields) {
+                const element = document.getElementById(field);
+                if (!element || !element.value || element.value.trim() === '') {
+                    alert(`Le champ ${field} est obligatoire`);
+                    return;
+                }
+            }
+
+            try {
+                // Update profile information
+                const profileResponse = await fetch(`${CONFIG.API_USERS_URL}/api/profile/`, {
+                    method: 'PUT',
+                    headers: { 
+                        ...authHeader(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!profileResponse.ok) {
+                    const error = await profileResponse.json();
+                    throw new Error(error.detail || 'Erreur lors de la mise à jour du profil');
+                }
+
+                // If role changed, we might need to handle that separately
+                if (currentProfile && currentProfile.role !== data.role) {
+                    console.log('Role changed from', currentProfile.role, 'to', data.role);
+                    // The backend will handle role change when updating the user
+                }
+
+                alert('Profil mis à jour avec succès! Votre demande sera revalidée par l\'administrateur.');
+                window.location.href = 'status_pending.html';
+
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        // Load profile on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+            
+            const form = document.getElementById('profile-form');
+            form.addEventListener('submit', submitProfile);
+
+            // Add role change listener
+            const roleSelect = document.getElementById('role');
+            roleSelect.addEventListener('change', (e) => {
+                toggleRoleFields(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>

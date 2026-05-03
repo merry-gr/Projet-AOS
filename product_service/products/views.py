@@ -1,5 +1,6 @@
 import base64
 import json
+from django.db.models import Q
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -29,6 +30,21 @@ def get_user_id_from_token(request):
 @api_view(['GET'])
 def api_products_view(request):
     products = Product.objects.all()
+    
+    # Filter by search term
+    search = request.GET.get('search', '')
+    if search:
+        products = products.filter(
+            Q(name__icontains=search) |
+            Q(description__icontains=search) |
+            Q(category__icontains=search)
+        )
+    
+    # Filter by category
+    category = request.GET.get('category', '')
+    if category:
+        products = products.filter(category=category)
+    
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 

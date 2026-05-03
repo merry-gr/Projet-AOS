@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestion des Utilisateurs | MedConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/base.css">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .user-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .user-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-refused { background: #fee2e2; color: #991b1b; }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .reject-form {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .rejection-reasons {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0;
+        }
+        .rejection-reasons label {
+            display: block;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .rejection-reasons label:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        .rejection-reasons input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        .custom-reason {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="container">
+            <h1 class="mb-0"><i class="bi bi-shield-check me-3"></i>Administration des Utilisateurs</h1>
+            <p class="mb-0 opacity-75">Gérez l'approbation et le rejet des comptes utilisateurs</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Liste des Utilisateurs</h2>
+                    <button class="btn btn-primary" onclick="loadUsers()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Actualiser
+                    </button>
+                </div>
+                
+                <div id="users-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rejeter l'utilisateur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Sélectionnez la raison du rejet :</p>
+                    <div class="rejection-reasons">
+                        <label>
+                            <input type="checkbox" value="Informations incomplètes">
+                            Informations incomplètes
+                        </label>
+                        <label>
+                            <input type="checkbox" value="Nom d'entreprise invalide">
+                            Nom d'entreprise invalide
+                        </label>
+                        <label>
+                            <input type="checkbox" value="Numéro de licence invalide">
+                            Numéro de licence invalide
+                        </label>
+                        <label>
+                            <input type="checkbox" value="Adresse non vérifiable">
+                            Adresse non vérifiable
+                        </label>
+                        <label>
+                            <input type="checkbox" value="Documents manquants">
+                            Documents manquants
+                        </label>
+                        <label>
+                            <input type="checkbox" value="Activité non conforme">
+                            Activité non conforme
+                        </label>
+                    </div>
+                    <textarea class="custom-reason" id="customRejectionReason" placeholder="Autre raison (optionnel)"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmRejection()">Confirmer le rejet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../config.js"></script>
+    <script src="../../modules/layout.js"></script>
+    <script>window.MedLayout.init();</script>
+    <script>
+        let currentUserId = null;
+
+        async function loadUsers() {
+            const container = document.getElementById('users-container');
+            container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+            
+            try {
+                const response = await fetch(`${CONFIG.API_USERS_URL}/api/admin/users/`, {
+                    headers: { ...authHeader() }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur de chargement des utilisateurs');
+                }
+                
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            }
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById('users-container');
+            
+            if (users.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Aucun utilisateur trouvé.</div>';
+                return;
+            }
+
+            container.innerHTML = users.map(user => `
+                <div class="user-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-1">${escapeHtml(user.username)}</h5>
+                            <p class="text-muted mb-2">
+                                <strong>Rôle:</strong> ${user.role === 'vendeur' ? 'Vendeur' : 'Acheteur'}<br>
+                                <strong>Email:</strong> ${escapeHtml(user.email)}<br>
+                                <strong>Date d'inscription:</strong> ${new Date(user.date_joined).toLocaleDateString('fr-FR')}
+                            </p>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-badge status-${user.validation_status}">
+                                    ${getStatusText(user.validation_status)}
+                                </span>
+                                ${user.rejection_reason ? `<span class="text-danger small"><i class="bi bi-exclamation-triangle me-1"></i>${escapeHtml(user.rejection_reason)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="action-buttons">
+                                ${user.validation_status === 'pending' ? `
+                                    <button class="btn btn-success btn-sm" onclick="approveUser(${user.id})">
+                                        <i class="bi bi-check-circle me-1"></i>Approuver
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="showRejectModal(${user.id})">
+                                        <i class="bi bi-x-circle me-1"></i>Rejeter
+                                    </button>
+                                ` : ''}
+                                ${user.validation_status === 'refused' ? `
+                                    <button class="btn btn-warning btn-sm" onclick="approveUser(${user.id})">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>Réapprouver
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'En attente',
+                'approved': 'Approuvé',
+                'refused': 'Refusé'
+            };
+            return statusMap[status] || status;
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function approveUser(userId) {
+            if (!confirm('Êtes-vous sûr de vouloir approuver cet utilisateur ?')) return;
+            
+            updateUserStatus(userId, 'approve');
+        }
+
+        function showRejectModal(userId) {
+            currentUserId = userId;
+            const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+            modal.show();
+        }
+
+        function confirmRejection() {
+            if (!currentUserId) return;
+            
+            const checkboxes = document.querySelectorAll('.rejection-reasons input[type="checkbox"]:checked');
+            const reasons = Array.from(checkboxes).map(cb => cb.value);
+            const customReason = document.getElementById('customRejectionReason').value.trim();
+            
+            if (reasons.length === 0 && !customReason) {
+                alert('Veuillez sélectionner une raison ou en spécifier une.');
+                return;
+            }
+            
+            const finalReason = [...reasons, customReason].filter(r => r).join('; ');
+            updateUserStatus(currentUserId, 'reject', finalReason);
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+            modal.hide();
+            
+            // Reset form
+            document.querySelectorAll('.rejection-reasons input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('customRejectionReason').value = '';
+            currentUserId = null;
+        }
+
+        async function updateUserStatus(userId, action, rejectionReason = '') {
+            try {
+                const response = await fetch(`${CONFIG.API_USERS_URL}/api/admin/users/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...authHeader()
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        action: action,
+                        rejection_reason: rejectionReason
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erreur lors de la mise à jour');
+                }
+
+                const result = await response.json();
+                alert(result.message);
+                loadUsers(); // Refresh the list
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', loadUsers);
+    </script>
+</body>
+</html>

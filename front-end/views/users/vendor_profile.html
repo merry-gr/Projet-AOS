@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <title>Compléter Profil Vendeur | MedConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 600px; border-radius:20px;">
+        <h2 class="fw-bold mb-2">Détails du Fournisseur</h2>
+        <p class="text-muted mb-4">Complétez vos informations de licence pour vendre sur la plateforme.</p>
+        
+        <div id="msg"></div>
+        <form id="vendor-form">
+            <div class="mb-3">
+                <label class="form-label">Nom de l'entreprise (Vendeur)</label>
+                <input id="company_name" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Numéro de Licence / Registre Commerce</label>
+                <input id="license_number" class="form-control" placeholder="RC-2026-XXXX" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Téléphone professionnel</label>
+                <input id="phone" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Adresse du siège</label>
+                <textarea id="address" class="form-control" rows="3" required></textarea>
+            </div>
+            <button class="btn btn-success w-100 py-2" type="submit">Enregistrer et envoyer pour validation</button>
+        </form>
+    </div>
+</div>
+
+<script src="../../config.js"></script>
+<script>
+    const token = localStorage.getItem('access_token');
+    if(!token) window.location.href = 'login.html';
+
+    // 1. Charger les données existantes (au cas où c'est une correction après refus)
+    async function fetchExistingProfile() {
+        try {
+            const r = await fetch(`${CONFIG.API_USERS_URL}/api/profile/`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if(r.ok) {
+                const data = await r.json();
+                if(data.company_name) document.getElementById('company_name').value = data.company_name;
+                if(data.phone) document.getElementById('phone').value = data.phone;
+                if(data.address) document.getElementById('address').value = data.address;
+                if(data.license_number) document.getElementById('license_number').value = data.license_number;
+                
+                // Afficher le motif de refus si existant
+                if(data.validation_status === 'refused') {
+                    document.getElementById('msg').innerHTML = `
+                        <div class="alert alert-warning">
+                            <strong>Profil refusé :</strong> ${data.rejection_reason || "Veuillez corriger vos informations."}
+                        </div>`;
+                }
+            }
+        } catch (err) { console.error("Erreur de chargement", err); }
+    }
+    fetchExistingProfile();
+
+    // 2. Soumission du formulaire
+    document.getElementById('vendor-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const payload = { 
+            company_name: document.getElementById('company_name').value, 
+            phone: document.getElementById('phone').value, 
+            address: document.getElementById('address').value,
+            license_number: document.getElementById('license_number').value 
+        };
+
+        try {
+            const r = await fetch(`${CONFIG.API_USERS_URL}/api/profile/`, { 
+                method: 'PUT', // PUT est utilisé pour mettre à jour le profil existant
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': 'Bearer ' + token 
+                }, 
+                body: JSON.stringify(payload) 
+            });
+
+            const data = await r.json();
+
+            if(r.ok) {
+                document.getElementById('msg').innerHTML = '<div class="alert alert-success">Profil mis à jour et envoyé pour validation !</div>';
+                setTimeout(() => window.location.href = 'status_pending.html', 1500);
+            } else {
+                document.getElementById('msg').innerHTML = `<div class="alert alert-danger">Erreur: ${JSON.stringify(data)}</div>`;
+            }
+        } catch (err) {
+            document.getElementById('msg').innerHTML = '<div class="alert alert-danger">Erreur de connexion au serveur.</div>';
+        }
+    });
+</script>
+</body>
+</html>

@@ -23,7 +23,7 @@ async function loadVendorProducts() {
     }
 
     // Note the trailing slash after 'vendor/' to match your urls.py
-    const url = `${CONFIG.API_PRODUCTS_URL}/vendor/?vendor_id=${vendorId}`;
+    const url = `${CONFIG.API_PRODUCTS_URL}/api/products/vendor/?vendor_id=${vendorId}`;
     
     const response = await fetch(url, {
         headers: { ...authHeader() }
@@ -65,7 +65,31 @@ async function fetchPublicUsersByIds(ids = []) {
 
 async function loadProducts() {
     const grid = document.getElementById('products-grid');
-    const response = await fetch(`${CONFIG.API_PRODUCTS_URL}/api/products/`);
+    
+    // Get filter values
+    const searchInput = document.getElementById('search-input');
+    const categorySelect = document.getElementById('category-select');
+    
+    const searchTerm = searchInput ? searchInput.value : '';
+    const category = categorySelect ? categorySelect.value : '';
+    
+    // Build URL with query parameters
+    let url = `${CONFIG.API_PRODUCTS_URL}/api/products/`;
+    const params = new URLSearchParams();
+    
+    if (searchTerm) {
+        params.append('search', searchTerm);
+    }
+    
+    if (category) {
+        params.append('category', category);
+    }
+    
+    if (params.toString()) {
+        url += '?' + params.toString();
+    }
+    
+    const response = await fetch(url);
     const products = await response.json();
 
     const usersById = await fetchPublicUsersByIds(products.map((p) => p.vendor_id));

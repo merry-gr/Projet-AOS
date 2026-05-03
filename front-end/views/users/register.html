@@ -1,263 +1,114 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Inscription Professionnelle | MedConnect</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<style>
-    :root {
-        --med-primary: #0d6efd;
-        --med-success: #198754;
-        --med-navy: #0f172a;
-        --med-slate: #1e293b;
-    }
-
-    .register-wrapper {
-        min-height: 95vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 60px 15px;
-        background: radial-gradient(circle at top right, rgba(25, 135, 84, 0.05), transparent);
-    }
-
-    .register-card {
-        border: 1px solid rgba(0,0,0,0.05);
-        border-radius: 24px;
-        overflow: hidden;
-        background: #ffffff;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        max-width: 1100px;
-        width: 100%;
-    }
-
-    /* Section Gauche : Branding & Confiance */
-    .register-left {
-        background: var(--med-navy);
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(25, 135, 84, 0.2) 0, transparent 50%),
-            linear-gradient(135deg, var(--med-navy) 0%, #064e3b 100%);
-        color: white;
-        padding: 60px 45px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .register-left h2 { font-weight: 800; font-size: 2.5rem; letter-spacing: -1px; }
-    .register-left p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
-
-    .feature-list { list-style: none; padding: 0; margin-top: 30px; }
-    .feature-list li {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 15px;
-        font-size: 0.95rem;
-        color: #cbd5e1;
-    }
-
-    /* Section Droite : Formulaire */
-    .register-right {
-        padding: 60px;
-        background: white;
-    }
-
-    .register-title { font-weight: 800; color: var(--med-navy); }
-
-    /* Customization des champs Django */
-    .register-right p { margin-bottom: 20px; }
-    
-    .register-right label {
-        font-weight: 700;
-        font-size: 0.75rem;
-        margin-bottom: 6px;
-        display: block;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-    }
-
-    .register-right input, 
-    .register-right select {
-        width: 100%;
-        padding: 10px 16px;
-        border: 2px solid #f1f5f9;
-        border-radius: 12px;
-        background: #f8fafc;
-        transition: 0.2s;
-        font-weight: 500;
-    }
-
-    .register-right input:focus, 
-    .register-right select:focus {
-        border-color: var(--med-success);
-        background: white;
-        outline: none;
-        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.08);
-    }
-
-    /* Help text & Errors */
-    .helptext { display: block; font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
-    .errorlist { list-style: none; padding: 0; color: #e11d48; font-size: 0.8rem; font-weight: 600; }
-
-    .btn-register {
-        background: var(--med-success);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 14px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        transition: 0.3s;
-        margin-top: 15px;
-    }
-
-    .btn-register:hover {
-        background: #15803d;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(21, 128, 61, 0.2);
-        color: white;
-    }
-
-    /* Dark Mode */
-    [data-bs-theme="dark"] .register-card { background: #0f172a; border-color: rgba(255,255,255,0.05); }
-    [data-bs-theme="dark"] .register-right { background: #0f172a; }
-    [data-bs-theme="dark"] .register-title { color: white; }
-    [data-bs-theme="dark"] .register-right input, 
-    [data-bs-theme="dark"] .register-right select {
-        background: #1e293b;
-        border-color: #334155;
-        color: white;
-    }
-
-    @media (max-width: 991px) {
-        .register-left { display: none; }
-        .register-right { padding: 40px 25px; }
-    }
-</style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inscription | MedConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --med-navy: #0f172a; --med-success: #198754; }
+        .register-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f8fafc; }
+        .register-card { border-radius: 24px; overflow: hidden; background: white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 900px; width: 100%; border: none; }
+        .register-left { background: linear-gradient(135deg, var(--med-navy) 0%, #064e3b 100%); color: white; padding: 60px; }
+        .register-right { padding: 60px; }
+        .btn-register { background: var(--med-success); color: white; border-radius: 12px; padding: 12px; font-weight: bold; width: 100%; border: none; transition: 0.3s; }
+        .btn-register:hover { background: #15803d; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
 
 <div class="register-wrapper">
     <div class="card register-card">
         <div class="row g-0">
-            
-            <div class="col-lg-5 register-left">
-                <div class="mb-5">
-                    <i class="bi bi-plus-circle-fill text-success fs-1"></i>
-                </div>
-                <h2>Créez votre compte Pro</h2>
-                <p>Accédez aux outils de gestion MedConnect et rejoignez le réseau leader du matériel médical.</p>
-                
-                <ul class="feature-list">
-                    <li><i class="bi bi-shield-lock-fill text-success"></i> Accès sécurisé 256-bit</li>
-                    <li><i class="bi bi-graph-up-arrow text-success"></i> Statistiques de vente en temps réel</li>
-                    <li><i class="bi bi-people-fill text-success"></i> Réseau de +500 fournisseurs</li>
-                </ul>
-
-                <div class="mt-auto pt-5">
-                    <span class="small opacity-50">Certifié conforme aux normes B2B</span>
-                </div>
+            <div class="col-lg-5 register-left d-none d-lg-flex flex-column justify-content-center">
+                <h2>Bienvenue sur MedConnect</h2>
+                <p>La plateforme B2B pour le matériel médical en Algérie.</p>
             </div>
-
             <div class="col-lg-7 register-right">
-                <div class="mb-5">
-                    <h2 class="register-title h3 mb-1">Inscription</h2>
-                    <p class="text-muted small">Portail d'enregistrement des partenaires</p>
-                </div>
-
+                <h2 class="h3 mb-4 fw-bold">Créer un compte</h2>
                 <form id="register-form">
-                    <div class="form-grid">
-                        <p>
-                            <label for="username">Nom d'utilisateur</label>
-                            <input id="username" name="username" type="text" required />
-                        </p>
-                        <p>
-                            <label for="email">Email</label>
-                            <input id="email" name="email" type="email" required />
-                        </p>
-                        <p>
-                            <label for="password">Mot de passe</label>
-                            <input id="password" name="password" type="password" required />
-                            <span class="helptext">Utilisez au moins 8 caractères.</span>
-                        </p>
-                        <div id="register-error" class="text-danger small mb-2" style="display:none"></div>
-                        <div id="register-success" class="text-success small mb-2" style="display:none"></div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase">Nom d'utilisateur</label>
+                        <input id="username" type="text" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase">Email</label>
+                        <input id="email" type="email" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase">Vous êtes ?</label>
+                        <select id="role" class="form-select" required>
+                            <option value="acheteur">Acheteur (Hôpital, Clinique...)</option>
+                            <option value="vendeur">Vendeur (Fournisseur)</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase">Mot de passe</label>
+                        <input id="password" type="password" class="form-control" required />
                     </div>
                     
-                    <button type="submit" class="btn btn-register w-100">
-                        Créer mon espace pro <i class="bi bi-chevron-right ms-2"></i>
-                    </button>
+                    <div id="register-error" class="alert alert-danger small" style="display:none"></div>
+                    <button type="submit" class="btn btn-register">Créer mon espace pro</button>
                 </form>
-
-                <div class="text-center mt-5">
-                    <p class="mb-0 text-muted small">
-                        Déjà un compte partenaire ? 
-                        <a href="login.html" class="fw-bold text-success text-decoration-none ms-1">S'identifier</a>
-                    </p>
-                </div>
             </div>
-
         </div>
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Optimisation dynamique des champs pour un look SaaS
-        const inputs = document.querySelectorAll('.register-right input, .register-right select');
-        inputs.forEach(el => {
-            // Suppression des classes par défaut pour éviter les conflits
-            el.placeholder = el.getAttribute('name').replace('_', ' ');
-            
-            // Focus automatique sur le premier champ vide
-            if(el.name === 'username') el.focus();
-        });
-    });
-</script>
 <script src="../../config.js"></script>
 <script>
-  (function () {
-    const form = document.getElementById('register-form');
-    const errEl = document.getElementById('register-error');
-    const okEl = document.getElementById('register-success');
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const roleValue = document.getElementById('role').value;
+        const payload = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            role: roleValue
+        };
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errEl.style.display = 'none';
-      okEl.style.display = 'none';
+        const errBox = document.getElementById('register-error');
+        errBox.style.display = 'none';
 
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const roleEl = document.getElementById('role');
-      const role = roleEl ? roleEl.value : null;
+        try {
+            const resp = await fetch(`${CONFIG.API_USERS_URL}/api/register/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-      try {
-        // #region agent log
-        fetch('http://127.0.0.1:7374/ingest/f84ea1d7-84b9-446a-906c-5789c271fc7b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'03f699'},body:JSON.stringify({sessionId:'03f699',runId:'pre-fix',hypothesisId:'H1',location:'front-end/views/users/register.html:submit-before-fetch',message:'Register payload shape',data:{hasUsername:Boolean(username),hasEmail:Boolean(email),hasPassword:Boolean(password),hasRole:Boolean(role)},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
-        const resp = await fetch(`${CONFIG.API_USERS_URL}/api/register/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password, ...(role ? { role } : {}) })
-        });
-        const data = await resp.json().catch(() => ({}));
-        // #region agent log
-        fetch('http://127.0.0.1:7374/ingest/f84ea1d7-84b9-446a-906c-5789c271fc7b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'03f699'},body:JSON.stringify({sessionId:'03f699',runId:'pre-fix',hypothesisId:'H1',location:'front-end/views/users/register.html:submit-after-fetch',message:'Register response shape',data:{ok:resp.ok,status:resp.status,hasRoleInResponse:Boolean(data && data.role),hasValidationStatusInResponse:Boolean(data && data.validation_status),keys:data?Object.keys(data):[]},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
-        if (!resp.ok) throw new Error(data?.detail || JSON.stringify(data) || 'Registration failed');
+            const contentType = resp.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await resp.json();
+                
+                if (!resp.ok) {
+                    // Gérer les erreurs de validation (ex: utilisateur déjà existant)
+                    let errorMessage = "";
+                    if (typeof data === 'object') {
+                        errorMessage = Object.values(data).flat().join(" ");
+                    } else {
+                        errorMessage = data.detail || "Erreur d'inscription";
+                    }
+                    throw new Error(errorMessage);
+                }
 
-        okEl.textContent = "Compte créé. Vous pouvez vous connecter.";
-        okEl.style.display = 'block';
-        setTimeout(() => (location.href = 'login.html'), 600);
-      } catch (err) {
-        errEl.textContent = err.message || 'Erreur réseau';
-        errEl.style.display = 'block';
-      }
+                // Succès : stockage des tokens
+                localStorage.setItem('access_token', data.access);
+                localStorage.setItem('refresh_token', data.refresh);
+                localStorage.setItem('user_role', roleValue);
+
+                // Redirection
+                window.location.href = (roleValue === 'vendeur') ? 'vendor_profile.html' : 'buyer_profile.html';
+                
+            } else {
+                throw new Error("Le serveur a renvoyé une réponse invalide (HTML). Vérifiez l'URL de l'API.");
+            }
+
+        } catch (err) {
+            errBox.textContent = err.message;
+            errBox.style.display = 'block';
+        }
     });
-  })();
 </script>
 </body>
 </html>
